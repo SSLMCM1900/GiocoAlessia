@@ -1,0 +1,1047 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scacchiera interattiva</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #222;
+      padding-top: 0px; /* Spazio sopra */
+    }
+
+    .scacchiera {
+    
+      display: grid;
+      grid-template-columns: repeat(8, 70px);
+      grid-template-rows: repeat(8, 70px);
+      border: 6px solid #333;
+    }
+
+    .scacchiera2 {
+      display: none;
+      grid-template-columns: repeat(8, 70px);
+      grid-template-rows: repeat(8, 70px);
+      border: 6px solid #333;
+    }
+
+    .casella {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 12px;
+      font-weight: bold;
+      text-align: center;
+      user-select: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .bianca {
+      background-color: #f0f0f0;
+      color: #000;
+      border: 1px solid black;
+    }
+
+    .nera {
+      background-color: #444;
+      color: #fff;
+    }
+
+    .casella:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+
+
+
+    .bottoni {
+      display: flex; /* Disposizione orizzontale */
+      justify-content: center; /* Centrati orizzontalmente */
+      gap: 15px; /* Spazio tra i bottoni */
+    }
+
+      .bottoni button {
+        width: 120px; /* Larghezza uniforme */
+       
+        padding: 6px;
+        font-size: 14px;
+        font-weight: bold;
+        color: #fff;
+        background-color: #4CAF50; /* Verde carino */
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+        .bottoni button:hover {
+          background-color: #45a049; /* Verde più scuro al passaggio */
+        }
+
+    #btn1 {
+      display: none; /* Nasconde il bottone all'inizio */
+    }
+
+
+
+    #titolo {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-align: center;
+      color:white;
+    }
+
+
+    #Vite5 {
+      display: flex;
+      position: absolute;
+      right: 472px; /* Spostato a destra */
+      font-size: 20px;
+      font-weight: bold;
+      color: red; /* Giallo oro */
+    }
+    #Vite4 {
+      display: none;
+      position: absolute;
+      right: 472px; /* Spostato a destra */
+      font-size: 20px;
+      font-weight: bold;
+      color: red; /* Giallo oro */
+    }
+
+
+    #Vite3 {
+      display:none;
+      position: absolute;
+      right: 472px; /* Spostato a destra */
+      font-size: 20px;
+      font-weight: bold;
+      color: red; /* Giallo oro */
+    }
+    #Vite2 {
+      display:none;
+      position: absolute;
+      right: 472px; /* Spostato a destra */
+      font-size: 20px;
+      font-weight: bold;
+      color: red; /* Giallo oro */
+    }
+    #Vite1 {
+      display:none;
+      position: absolute;
+      right: 472px; /* Spostato a destra */
+      font-size: 20px;
+      font-weight: bold;
+      color: red; /* Giallo oro */
+    }
+    .azioni {
+      position: relative;
+    }
+
+    .counter {
+      position: absolute;
+      right: 5px;
+      top: 0;
+      font-size: 20px;
+      font-weight: bold;
+      color: gold;
+    }
+   
+  </style>
+</head>
+<body>
+
+  <div>
+    <div class="intestazione">
+      <h1 id="titolo">Griglia visibile: Londra</h1>
+      <div class="azioni">
+        <a href="#" id="aiuto">Aiuto</a>
+        <a href="#" id="viteillimitate">Vite Illimitate</a>
+        <span id="counter" class="counter">0/4</span>
+      </div>
+    </div>
+    <div class="scacchiera" id="scacchiera1"></div>
+    <div class="scacchiera2" id="scacchiera2"></div>
+    <div class="scacchiera2" id="scacchiera3"></div>
+    <div class="scacchiera2" id="scacchiera4"></div>
+
+
+    <div class="bottoni">
+      <button id="btn1" ">Griglia precedente</button>
+      <button id="btn2">Griglia successiva</button>
+      <h1 id="Vite5">❤️❤️❤️❤️❤️ </h1>
+      <h1 id="Vite4">❤️❤️❤️❤️ </h1>
+      <h1 id="Vite3">❤️❤️❤️ </h1>
+      <h1 id="Vite2">❤️❤️ </h1>
+      <h1 id="Vite1">❤️ </h1>
+    </div>
+
+
+  </div>
+  <div id="contenitore1"></div>
+  <img id="foto1" src="foto1.jpg" hidden>
+  <div id="contenitore2"></div>
+  <img id="foto2" src="foto2.jpg" hidden>
+  <div id="contenitore3"></div>
+  <img id="foto3" src="foto3.jpg" hidden>
+  <div id="contenitore4"></div>
+  <img id="foto4" src="foto4.jpg" hidden>
+
+  <script>
+
+
+    const img1 = document.getElementById("foto1");
+    const contenitore1 = document.getElementById("contenitore1");
+
+    function mostraPorzione1(xSrc, ySrc, width, height, left = 100, top = 50) {
+      const nuovaImg = document.createElement("div");
+      nuovaImg.style.width = width + "px";
+      nuovaImg.style.height = height + "px";
+      nuovaImg.style.overflow = "hidden";      // taglia la parte extra
+      nuovaImg.style.position = "absolute";
+      nuovaImg.style.left = left + "px";
+      nuovaImg.style.top = top + "px";
+
+      const immagine = document.createElement("img");
+      immagine.src = img1.src;
+      immagine.style.position = "absolute";
+      immagine.style.left = `-${xSrc}px`;     // sposta per mostrare la porzione
+      immagine.style.top = `-${ySrc}px`;
+
+      nuovaImg.appendChild(immagine);
+      nuovaImg.classList.add("porzione1");
+      contenitore1.appendChild(nuovaImg);
+      // <-- aggiunta classe
+
+    }
+    const img2 = document.getElementById("foto2");
+    const contenitore2 = document.getElementById("contenitore2");
+
+    function mostraPorzione2(xSrc, ySrc, width, height, left = 100, top = 50) {
+      const nuovaImg = document.createElement("div");
+      nuovaImg.style.width = width + "px";
+      nuovaImg.style.height = height + "px";
+      nuovaImg.style.overflow = "hidden";      // taglia la parte extra
+      nuovaImg.style.position = "absolute";
+      nuovaImg.style.left = left + "px";
+      nuovaImg.style.top = top + "px";
+
+      const immagine = document.createElement("img");
+      immagine.src = img2.src;
+      immagine.style.position = "absolute";
+      immagine.style.left = `-${xSrc}px`;     // sposta per mostrare la porzione
+      immagine.style.top = `-${ySrc}px`;
+
+      nuovaImg.appendChild(immagine);
+      nuovaImg.classList.add("porzione2");
+      contenitore2.appendChild(nuovaImg);
+      // <-- aggiunta classe
+
+    }
+
+
+    const img3 = document.getElementById("foto3");
+    const contenitore3 = document.getElementById("contenitore3");
+
+    function mostraPorzione3(xSrc, ySrc, width, height, left = 100, top = 50) {
+      const nuovaImg = document.createElement("div");
+      nuovaImg.style.width = width + "px";
+      nuovaImg.style.height = height + "px";
+      nuovaImg.style.overflow = "hidden";      // taglia la parte extra
+      nuovaImg.style.position = "absolute";
+      nuovaImg.style.left = left + "px";
+      nuovaImg.style.top = top + "px";
+
+      const immagine = document.createElement("img");
+      immagine.src = img3.src;
+      immagine.style.position = "absolute";
+      immagine.style.left = `-${xSrc}px`;     // sposta per mostrare la porzione
+      immagine.style.top = `-${ySrc}px`;
+
+      nuovaImg.appendChild(immagine);
+      nuovaImg.classList.add("porzione3");
+      contenitore3.appendChild(nuovaImg);
+      // <-- aggiunta classe
+
+    }
+
+
+    const img4 = document.getElementById("foto4");
+    const contenitore4 = document.getElementById("contenitore4");
+
+    function mostraPorzione4(xSrc, ySrc, width, height, left = 100, top = 50) {
+      const nuovaImg = document.createElement("div");
+      nuovaImg.style.width = width + "px";
+      nuovaImg.style.height = height + "px";
+      nuovaImg.style.overflow = "hidden";      // taglia la parte extra
+      nuovaImg.style.position = "absolute";
+      nuovaImg.style.left = left + "px";
+      nuovaImg.style.top = top + "px";
+
+      const immagine = document.createElement("img");
+      immagine.src = img4.src;
+      immagine.style.position = "absolute";
+      immagine.style.left = `-${xSrc}px`;     // sposta per mostrare la porzione
+      immagine.style.top = `-${ySrc}px`;
+
+      nuovaImg.appendChild(immagine);
+      nuovaImg.classList.add("porzione4");
+      contenitore4.appendChild(nuovaImg);
+      // <-- aggiunta classe
+
+    }
+
+
+
+
+
+
+
+
+    const Vite1 = document.getElementById("Vite1");
+    const Vite2 = document.getElementById("Vite2");
+    const Vite3 = document.getElementById("Vite3");
+    const Vite4 = document.getElementById("Vite4");
+    const Vite5 = document.getElementById("Vite5");
+    Vite1.style.display = "none";
+    Vite2.style.display = "none";
+    Vite3.style.display = "none";
+    Vite4.style.display = "none";
+    Vite5.style.display = "flex";
+    const ViteLimitate = 1;
+
+    const scacchiera1 = document.getElementById("scacchiera1");
+    const aiutousato1 = [0, 0, 0, 0];
+    const aiutousato2 = [0, 0, 0, 0];
+    const aiutousato3 = [0, 0, 0, 0];
+    const aiutousato4 = [0, 0, 0, 0];
+
+    let counter1 = 0;
+    let counter2 = 0;
+    let counter3 = 0;
+    let counter4 = 0;
+    const counter = document.getElementById("counter");
+    // 🔹 Testo iniziale
+    const testiIniziali1 = [
+      "Camden Market", "Buckingham Palace", "Southbank Centre", "King’s Cross", "Tate Britain", "London Eye", "Kew Gardens", "Science Museum",
+      "Trafalgar Square", "London Dungeon", "Tea Tower", "London Zoo", "Globe Theatre", "Notting Hill", "Covent Garden", "Tower London", "Royal Albert",
+      "Millennium Bridge", "The Shard", "South Bank", "Westminster Abbey", "Oxford Street", "Borough Market", "Big Ben", "St James",
+      "Chelsea Garden", "Parliament Houses", "Tate Modern", "Harrods Store", " DreamWorks Land", "Spitalfields Market", "St Paul’s", "Somerset House", "Horse Guards",
+      "British Museum", "Palace Gardens", "Brexit Square", "Piccadilly Circus", "Leicester Square", "Bank Museum", "Sky Garden", "Covent Market", "Hyde Park",
+      "Kensington Palace", "Royal Mews", "Serpentine Gallery", "O2 Viewing", "Churchill Rooms", "Transport Museum", "Brick Lane", "National Gallery", " Anfield Stadium",
+      "Platform 9e3/4", "V&A Museum", "Leicester Gardens", "Greenwich Observatory", "O2 Arena", "Science Gallery", "Palace Tours", "Horse Road",
+      "St Paul’s Dome", "Tower Bridge", "Hampstead Heath", "Flower Show"
+    ]
+      ;
+
+
+    // 🔹 Testo che appare al click
+    const testiClick1 = Array(64).fill("");
+    testiClick1[10] = "4";
+    testiClick1[29] = "1";
+    testiClick1[36] = "3";
+    testiClick1[51] = "1";
+
+
+    const codicerisposta1 = Array(64).fill(0);
+
+    codicerisposta1[10] = 3;
+    codicerisposta1[29] = 2;
+    codicerisposta1[36] = 1;
+    codicerisposta1[51] = 4;
+
+    // 🔹 Creazione caselle
+    for (let i = 0; i < 64; i++) {
+      const casella = document.createElement("div");
+      casella.classList.add("casella");
+      casella.classList.add((Math.floor(i / 8) + i % 8) % 2 === 0 ? "bianca" : "bianca");
+      casella.textContent = testiIniziali1[i] || "";
+
+      // ✅ Cambio testo al click
+      casella.addEventListener("click", () => {
+        const errore = 0;
+        casella.textContent = testiClick1[i] || "Cliccato!";
+        if (codicerisposta1[i] == 0) {
+          const rect = casella.getBoundingClientRect();
+          const row = Math.floor(i / 8);
+          const col = i % 8;
+          mostraPorzione1(col * 70, row * 70, 70, 70, rect.left, rect.top);
+          casella.style.background = "black";
+          casella.style.color = "white";
+          if (Vite5.style.display == "flex" && errore == 0 && ViteLimitate == 1) {
+            Vite5.style.display = "none";
+            Vite4.style.display = "flex";
+            errore = 1;
+
+          }
+          if (Vite4.style.display == "flex" && errore == 0 && ViteLimitate == 1) {
+            Vite4.style.display = "none";
+            Vite3.style.display = "flex";
+            errore = 1;
+
+          }
+          if (Vite3.style.display == "flex" && errore == 0 && ViteLimitate == 1) {
+            Vite3.style.display = "none";
+            Vite2.style.display = "flex";
+            errore = 1;
+
+          }
+          if (Vite2.style.display == "flex" && errore == 0 && ViteLimitate == 1) {
+            Vite2.style.display = "none";
+            Vite1.style.display = "flex";
+            errore = 1;
+          }
+          if (Vite1.style.display == "flex" && errore == 0 && ViteLimitate == 1) {
+            location.reload();
+
+
+
+          }
+
+        }
+        if (codicerisposta1[i] == 1) {
+          casella.style.background = "blue";
+          casella.style.color = "black";
+          if (aiutousato1[0] == 0) {
+
+            counter1 = counter1 + 1;
+            counter.textContent = counter1 + "/4";
+          }
+          aiutousato1[0] = 1;
+        }
+        if (codicerisposta1[i] == 2) {
+          casella.style.background = "green";
+          casella.style.color = "black";
+          if (aiutousato1[1] == 0) {
+
+            counter1 = counter1 + 1;
+            counter.textContent = counter1 + "/4";
+          }
+          aiutousato1[1] = 1;
+        }
+
+        if (codicerisposta1[i] == 3) {
+          casella.style.background = "red";
+          casella.style.color = "black";
+          if (aiutousato1[2] == 0) {
+
+            counter1 = counter1 + 1;
+            counter.textContent = counter1 + "/4";
+          }
+          aiutousato1[2] = 1;
+        }
+        if (codicerisposta1[i] == 4) {
+          casella.style.background = "yellow";
+          casella.style.color = "black";
+          if (aiutousato1[3] == 0) {
+
+            counter1 = counter1 + 1;
+            counter.textContent = counter1 + "/4";
+          }
+          aiutousato1[3] = 1;
+
+        }
+      });
+
+      scacchiera1.appendChild(casella);
+    }
+
+    const scacchiera2 = document.getElementById("scacchiera2");
+
+
+    // 🔹 Testo iniziale
+    const testiIniziali2 = [
+      "Bombarda", "Expulso", "Descendo", "Alohomora", "Evanesco", "Pietrificus Totalus", "Erecto", "Lumos Maxima",
+      "Prior Incantio", "Protego", "Horclux", "Locomotor Mortis", "Confringo", "Relascio", "Capillus Maxima", "Stupeficium",
+      "Glacius", "Avada Kedavra", "Mucus Ad Nauseum", "Gemino", "Maleficio", "Melofors", "Nox", "Incanto Patronus",
+      "Oblivion", "Rictu Sempra", "Furgus", "Adduco Maxima", "Expelliarmus", "Imperius", "Animagus", "Diffindo",
+      "Wingardium Leviosa", "Aurum Transmutare", "Impedimenta", "Lapifors", "Periculum", "Ardemonio", "Fidelius", "Sectus Sempra",
+      "Incarcifors", "Crucio", "Lumos", "Legilimens", " Reducto", "Confundus", "Oppugno", " Aqua in Vinum",
+      "Accio", "Engorgio", "Arresto Momentum", "Levicorpus", "Politio", "Repellum Babanum", "Fumus", "Mobiliarmus",
+      "Protego Diabolica", "Avis", "Langue Lingua", " Volare Potentia", "Reparo", "Lacarnum Inflamare", "Lumos Maxima", "Reducio"
+    ];
+
+
+    // 🔹 Testo che appare al click
+    const testiClick2 = Array(64).fill("");
+    testiClick2[14] = "3";
+    testiClick2[33] = "7";
+    testiClick2[47] = "3";
+    testiClick2[59] = "1";
+
+
+
+    const codicerisposta2 = Array(64).fill(0);
+
+    codicerisposta2[14] = 1;
+    codicerisposta2[33] = 3;
+    codicerisposta2[47] = 2;
+    codicerisposta2[59] = 4;
+
+
+    // 🔹 Creazione caselle
+    for (let i = 0; i < 64; i++) {
+      const casella = document.createElement("div");
+      casella.classList.add("casella");
+      casella.classList.add((Math.floor(i / 8) + i % 8) % 2 === 0 ? "bianca" : "bianca");
+      casella.textContent = testiIniziali2[i] || "";
+
+      // ✅ Cambio testo al click
+      casella.addEventListener("click", () => {
+        const errore = 0;
+        casella.textContent = testiClick2[i] || "Cliccato!";
+        if (codicerisposta2[i] == 0) {
+          const rect = casella.getBoundingClientRect();
+          const row = Math.floor(i / 8);
+          const col = i % 8;
+          mostraPorzione2(col * 70, row * 70, 70, 70, rect.left, rect.top);
+          casella.style.background = "black";
+          casella.style.color = "white";
+
+          if (Vite5.style.display == "flex" && errore == 0 && ViteLimitate == 1) {
+            Vite5.style.display = "none";
+            Vite4.style.display = "flex";
+            errore = 1;
+
+          }
+          if (Vite4.style.display == "flex" && errore == 0 && ViteLimitate == 1) {
+            Vite4.style.display = "none";
+            Vite3.style.display = "flex";
+            errore = 1;
+
+          }
+          if (Vite3.style.display == "flex" && errore == 0 && ViteLimitate == 1) {
+            Vite3.style.display = "none";
+            Vite2.style.display = "flex";
+            errore = 1;
+
+          }
+          if (Vite2.style.display == "flex" && errore == 0 && ViteLimitate == 1) {
+            Vite2.style.display = "none";
+            Vite1.style.display = "flex";
+            errore = 1;
+          }
+          if (Vite1.style.display == "flex" && errore == 0 && ViteLimitate == 1) {
+            location.reload();
+
+
+
+          }
+        }
+        if (codicerisposta2[i] == 1) {
+          casella.style.background = "blue";
+          casella.style.color = "black";
+          if (aiutousato2[0] == 0) {
+            counter2 = counter2 + 1;
+            counter.textContent = counter2 + "/4";
+          }
+          aiutousato2[0] = 1;
+        }
+        if (codicerisposta2[i] == 2) {
+          casella.style.background = "green";
+          casella.style.color = "black";
+          if (aiutousato2[1] == 0) {
+          
+            counter2 = counter2 + 1;
+            counter.textContent = counter2 + "/4";
+          }
+        
+          aiutousato2[1] = 1;
+        }
+
+        if (codicerisposta2[i] == 3) {
+          casella.style.background = "red";
+          casella.style.color = "black";
+          if (aiutousato2[2] == 0) {
+
+            counter2 = counter2 + 1;
+            counter.textContent = counter2 + "/4";
+          }
+          aiutousato2[2] =1
+        }
+        if (codicerisposta2[i] == 4) {
+          casella.style.background = "yellow";
+          casella.style.color = "black";
+          if (aiutousato2[3] == 0) {
+            counter2 = counter2 + 1;
+            counter.textContent = counter2 + "/4";
+          }
+          aiutousato2[3] = 1;
+
+        }
+      });
+
+      scacchiera2.appendChild(casella);
+    }
+
+    const scacchiera3 = document.getElementById("scacchiera3");
+
+    // 🔹 Testo iniziale
+    const testiIniziali3 = [
+      "Genoa", "Salernitana", "Fiorentina", "Empoli", "VIcenza", "Novara", "Juventus", "Spal",
+      "Benevento", "Napoli", "Albinoleffe", "Spezia", "Cosenza", "Sassuolo", "Udinese", "Palermo",
+      "Catanzaro", "Avellino", "Livorno", "Arezzo", "Roma", "Ancona", "Carpi", "Modena",
+      "Mantova", "Carrarese", "Juve Stabia", "Cremonese", "Perugia", "Bari", "Torino", "Chievo",
+      "Venezia", "Como", "Frosinone", "Reggiana", "Sudtirol", "Entella", "Lecce", "Cesena",
+      "Monza", "Catania", "Albinoleffe", "Sampdoria", "Milan", "Padova", "Pescara", "Cittadella",
+      "Parma", "Inter", "Lecco", "Pro vercelli", "Triestina", "Atalanta", "Ascoli", "Siena",
+      "Pisa", "Ternana", "Foggia", "Cagliari", "Latina", "Crotone", "Verona", "Trapani"
+    ];
+
+
+    // 🔹 Testo che appare al click
+    const testiClick3 = Array(64).fill("");
+    testiClick3[6] = "7";
+    testiClick3[20] = "3";
+    testiClick3[41] = "1";
+    testiClick3[55] = "3";
+
+
+    const codicerisposta3 = Array(64).fill(0);
+
+    codicerisposta3[6] = 4;
+    codicerisposta3[20] = 1;
+    codicerisposta3[41] = 3;
+    codicerisposta3[55] = 2;
+
+
+    // 🔹 Creazione caselle
+    for (let i = 0; i < 64; i++) {
+      const casella = document.createElement("div");
+      casella.classList.add("casella");
+      casella.classList.add((Math.floor(i / 8) + i % 8) % 2 === 0 ? "bianca" : "bianca");
+      casella.textContent = testiIniziali3[i] || "";
+
+      // ✅ Cambio testo al click
+      casella.addEventListener("click", () => {
+        const errore = 0;
+        casella.textContent = testiClick3[i] || "Cliccato!";
+        if (codicerisposta3[i] == 0) {
+          const rect = casella.getBoundingClientRect();
+          const row = Math.floor(i / 8);
+          const col = i % 8;
+          mostraPorzione3(col * 70, row * 70, 70, 70, rect.left, rect.top);
+          casella.style.background = "black";
+          casella.style.color = "white";
+          if (Vite5.style.display == "flex" && errore == 0 && ViteLimitate == 1) {
+            Vite5.style.display = "none";
+            Vite4.style.display = "flex";
+            errore = 1;
+
+          }
+          if (Vite4.style.display == "flex" && errore == 0 && ViteLimitate == 1) {
+            Vite4.style.display = "none";
+            Vite3.style.display = "flex";
+            errore = 1;
+
+          }
+          if (Vite3.style.display == "flex" && errore == 0 && ViteLimitate == 1) {
+            Vite3.style.display = "none";
+            Vite2.style.display = "flex";
+            errore = 1;
+
+          }
+          if (Vite2.style.display == "flex" && errore == 0 && ViteLimitate == 1) {
+            Vite2.style.display = "none";
+            Vite1.style.display = "flex";
+            errore = 1;
+          }
+          if (Vite1.style.display == "flex" && errore == 0 && ViteLimitate == 1) {
+            location.reload();
+
+
+
+          }
+        }
+        if (codicerisposta3[i] == 1) {
+          casella.style.background = "blue";
+          casella.style.color = "black";
+          if (aiutousato3[0] == 0) {
+
+            counter3 = counter3 + 1;
+            counter.textContent = counter3 + "/4";
+          }
+          aiutousato3[0] = 1;
+        }
+        if (codicerisposta3[i] == 2) {
+          casella.style.background = "green";
+          casella.style.color = "black";
+          if (aiutousato3[1] == 0) {
+
+            counter3 = counter3 + 1;
+            counter.textContent = counter3 + "/4";
+          }
+          aiutousato3[1] = 1;
+        }
+
+        if (codicerisposta3[i] == 3) {
+          casella.style.background = "red";
+          casella.style.color = "black";
+          if (aiutousato3[2] == 0) {
+
+            counter3 = counter3 + 1;
+            counter.textContent = counter3 + "/4";
+          }
+          aiutousato3[2] = 1;
+        }
+        if (codicerisposta3[i] == 4) {
+          casella.style.background = "yellow";
+          casella.style.color = "black";
+          if (aiutousato3[3] == 0) {
+
+            counter3 = counter3 + 1;
+            counter.textContent = counter3 + "/4";
+          }
+          aiutousato3[3] = 1;
+
+        }
+      });
+
+      scacchiera3.appendChild(casella);
+    }
+
+
+
+    const scacchiera4 = document.getElementById("scacchiera4");
+
+    // 🔹 Testo che appare al click
+    const testiIniziali4 = [
+      "Tamarindo", "Mandarino", "Liquirizia", "Fragola", "Rosmarino", "Salvia", "Cacao", "Pasta di ceci",
+      "Pomodoro", "Assensio", "Maracuja", "Latte", "mais", "Ciliegia", "Zucchero", "Pompelmo",
+      "Orzo", "Miele", "Sale", "Gelso", "Canditi", "Mirtillo", "Noce Moscacta", "Soia",
+      "Paprika", "Mandorla", "Noce", "Vino bianco", "Litchi", "Olio", "Cocomero", "Alloro",
+      "Champagne", "Aceto", "Albume", "Alcool Neutro", "Bacche di goji", "Yogurt greco", "Fiori di ibisco", "Ginseng",
+      "Mango", "Mirto", "Peperoncino", "Semi di zucca", "Eucalipto", "Stevia", "Melograno", "Menta",
+      "kiwi", "Acqua", "Banana", "Chinotto", "Cannella", "Arancia Amara", "Cumino", "Vino rosso",
+      "Caffe", "Mora", "Zenzero", "Malto", "Pepe", "Colorante", "Sambuca", "Birra"
+    ];
+    // 🔹 Testo iniziale
+    const testiClick4 = Array(64).fill("");
+    testiClick4[14] = "7";
+    testiClick4[35] = "1";
+    testiClick4[61] = "2";
+    testiClick4[49] = "2";
+
+
+
+
+    const codicerisposta4 = Array(64).fill(0);
+
+    codicerisposta4[14] = 2;
+    codicerisposta4[35] = 1;
+    codicerisposta4[61] = 4;
+    codicerisposta4[49] = 3;
+
+    // 🔹 Creazione caselle
+    for (let i = 0; i < 64; i++) {
+      const casella = document.createElement("div");
+      casella.classList.add("casella");
+      casella.classList.add((Math.floor(i / 8) + i % 8) % 2 === 0 ? "bianca" : "bianca");
+      casella.textContent = testiIniziali4[i] || "";
+
+      // ✅ Cambio testo al click
+      casella.addEventListener("click", () => {
+        const errore = 0;
+        casella.textContent = testiClick4[i] || "Cliccato!";
+        if (codicerisposta4[i] == 0) {
+          const rect = casella.getBoundingClientRect();
+          const row = Math.floor(i / 8);
+          const col = i % 8;
+          mostraPorzione4(col * 70, row * 70, 70, 70, rect.left, rect.top);
+          casella.style.background = "black";
+          casella.style.color = "white";
+          if (Vite5.style.display == "flex" && errore == 0 && ViteLimitate == 1) {
+            Vite5.style.display = "none";
+            Vite4.style.display = "flex";
+            errore = 1;
+
+          }
+          if (Vite4.style.display == "flex" && errore == 0 && ViteLimitate == 1) {
+            Vite4.style.display = "none";
+            Vite3.style.display = "flex";
+            errore = 1;
+
+          }
+          if (Vite3.style.display == "flex" && errore == 0 && ViteLimitate == 1) {
+            Vite3.style.display = "none";
+            Vite2.style.display = "flex";
+            errore = 1;
+
+          }
+          if (Vite2.style.display == "flex" && errore == 0 && ViteLimitate == 1) {
+            Vite2.style.display = "none";
+            Vite1.style.display = "flex";
+            errore = 1;
+          }
+          if (Vite1.style.display == "flex" && errore == 0 && ViteLimitate == 1) {
+            location.reload();
+
+
+
+          }
+        }
+        if (codicerisposta4[i] == 1) {
+          casella.style.background = "blue";
+          casella.style.color = "black";
+          if (aiutousato4[0] == 0) {
+
+            counter4 = counter4 + 1;
+            counter.textContent = counter4 + "/4";
+          }
+          aiutousato4[0] = 1;
+        }
+        if (codicerisposta4[i] == 2) {
+          casella.style.background = "green";
+          casella.style.color = "black";
+          if (aiutousato4[1] == 0) {
+
+            counter4 = counter4 + 1;
+            counter.textContent = counter4 + "/4";
+          }
+          aiutousato4[1] = 1;
+        }
+
+        if (codicerisposta4[i] == 3) {
+          casella.style.background = "red";
+          casella.style.color = "black";
+          if (aiutousato4[2] == 0) {
+
+            counter4 = counter4 + 1;
+            counter.textContent = counter4 + "/4";
+          }
+          aiutousato4[2] = 1;
+        }
+        if (codicerisposta4[i] == 4) {
+          casella.style.background = "yellow";
+          casella.style.color = "black";
+          if (aiutousato4[3] == 0) {
+
+            counter4 = counter4 + 1;
+            counter.textContent = counter4 + "/4";
+          }
+          aiutousato4[3] = 1;
+
+        }
+      });
+
+      scacchiera4.appendChild(casella);
+
+
+
+    }
+
+
+
+
+
+
+
+    const BottonePrec = document.getElementById("btn1");
+    const BottoneSucc = document.getElementById("btn2");
+    const Titolo = document.getElementById("titolo")
+    BottonePrec.style.display = "none"; // Nascondi "precedente" all'inizio
+
+    // Imposta la prima scacchiera visibile via JS
+    scacchiera1.style.display = "grid";
+    scacchiera2.style.display = "none";
+    scacchiera3.style.display = "none";
+    scacchiera4.style.display = "none";
+
+    BottonePrec.addEventListener("click", () => {
+      const porzioni1 = document.querySelectorAll(".porzione1");
+      const porzioni2 = document.querySelectorAll(".porzione2");
+      const porzioni3 = document.querySelectorAll(".porzione3");
+      const porzioni4 = document.querySelectorAll(".porzione4");
+      if (getComputedStyle(scacchiera2).display === "grid") {
+        scacchiera2.style.display = "none";
+        scacchiera1.style.display = "grid";
+        counter.textContent = counter1 + "/4";
+        BottonePrec.style.display = "none";
+        BottoneSucc.style.display = "flex";
+        Titolo.textContent = "Griglia visibile : Londra"
+   
+        porzioni2.forEach(img => img.style.display = "none"); // oppure img.style.display = "none";
+     
+        porzioni1.forEach(img => img.style.display = "flex"); // oppure img.style.display = "none";
+
+      } else if (getComputedStyle(scacchiera3).display === "grid") {
+        scacchiera3.style.display = "none";
+        scacchiera2.style.display = "grid";
+        counter.textContent = counter2 + "/4";
+        BottoneSucc.style.display = "flex";
+        Titolo.textContent = "Griglia visibile : Harry Potter"
+      
+        porzioni3.forEach(img => img.style.display = "none"); // oppure img.style.display = "none";
+   
+        porzioni2.forEach(img => img.style.display = "flex"); // oppure img.style.display = "none";
+      } else if (getComputedStyle(scacchiera4).display === "grid") {
+        scacchiera4.style.display = "none";
+        scacchiera3.style.display = "grid";
+        counter.textContent = counter3 + "/4";
+        BottoneSucc.style.display = "flex";
+        Titolo.textContent = "Griglia visibile : Lazio"
+
+        porzioni4.forEach(img => img.style.display = "none"); // oppure img.style.display = "none";
+      
+        porzioni3.forEach(img => img.style.display = "flex"); // oppure img.style.display = "none";
+      }
+    });
+
+    BottoneSucc.addEventListener("click", () => {
+      const porzioni1 = document.querySelectorAll(".porzione1");
+      const porzioni2 = document.querySelectorAll(".porzione2");
+      const porzioni3 = document.querySelectorAll(".porzione3");
+      const porzioni4 = document.querySelectorAll(".porzione4");
+      if (getComputedStyle(scacchiera1).display === "grid") {
+        scacchiera1.style.display = "none";
+        scacchiera2.style.display = "grid";
+        counter.textContent = counter2 + "/4";
+        BottonePrec.style.display = "flex";
+        Titolo.textContent = "Griglia visibile : Harry Potter"
+ 
+        porzioni1.forEach(img => img.style.display = "none"); // oppure img.style.display = "none";
+
+        porzioni2.forEach(img => img.style.display = "flex"); // oppure img.style.display = "none";
+      } else if (getComputedStyle(scacchiera2).display === "grid") {
+        scacchiera2.style.display = "none";
+        scacchiera3.style.display = "grid";
+        counter.textContent = counter3 + "/4";
+        BottonePrec.style.display = "flex";
+        Titolo.textContent = "Griglia visibile : Lazio"
+   
+        porzioni2.forEach(img => img.style.display = "none"); // oppure img.style.display = "none";
+        
+        porzioni3.forEach(img => img.style.display = "flex"); // oppure img.style.display = "none";
+      } else if (getComputedStyle(scacchiera3).display === "grid") {
+        scacchiera3.style.display = "none";
+        scacchiera4.style.display = "grid";
+        counter.textContent = counter4 + "/4";
+        BottoneSucc.style.display = "none"; // Nascondi se siamo all'ultima
+        Titolo.textContent = "Griglia visibile : Campari"
+       
+        porzioni4.forEach(img => img.style.display = "flex"); // oppure img.style.display = "none";
+       
+        porzioni3.forEach(img => img.style.display = "none"); // oppure img.style.display = "none";
+      }
+    });
+
+
+
+    const aiuto = document.getElementById("aiuto");
+    aiuto.addEventListener("click", () => {
+      if (scacchiera1.style.display == "grid") {
+        if (aiutousato1[0] == 0) {
+          alert("Sarebbe stata inaugurata dopo il 2016");
+        }
+        else if (aiutousato1[1] == 0) {
+          alert("Volendo copiare Parigi...");
+        }
+
+        else if (aiutousato1[2] == 0) {
+          alert("Pienissima alle 17:00");
+        }
+        else if (aiutousato1[3] == 0) {
+          alert("Il navigatore ti ha portato nella città sbagliata");
+        }
+
+        else if (aiutousato1.reduce((acc, val) => acc && val === 1, true)) {
+          alert("Hai trovato tutte le risposte in questa griglia");
+        }
+
+      }
+      else if (scacchiera2.style.display == "grid") {
+        if (aiutousato2[0] == 0) {
+          alert("Ottima alternativa alla Turchia...");
+
+        }
+        else if (aiutousato2[1] == 0) {
+          alert("Il preferito di Gesù");
+        }
+
+        else if (aiutousato2[2] == 0) {
+          alert("Re Mida");
+        }
+        else if (aiutousato2[3] == 0) {
+          alert("Doping per il quiddich");
+        }
+        else if (aiutousato2.reduce((acc, val) => acc && val === 1, true)) {
+          alert("Hai trovato tutte le risposte in questa griglia");
+        }
+      }
+      else if (scacchiera3.style.display == "grid") {
+        if (aiutousato3[0] == 0) {
+          alert("'cugini'");
+        }
+        else if (aiutousato3[1] == 0) {
+          alert("Piace (forse) ai cavalli");
+        }
+
+        else if (aiutousato3[2] == 0) {
+          alert("Elefante");
+        }
+        else if (aiutousato3[3] == 0) {
+          alert("La televisione fino agli anni '60");
+        }
+        else if (aiutousato3.reduce((acc, val) => acc && val === 1, true)) {
+          alert("Hai trovato tutte le risposte in questa griglia");
+        }
+      }
+      else if (scacchiera4.style.display == "grid") {
+        if (aiutousato4[0] == 0) {
+          alert("Senza sapore nè odore");
+        }
+        else if (aiutousato4[1] == 0) {
+          alert("Mi raccomando quello bianco");
+        }
+
+        else if (aiutousato4[2] == 0) {
+          alert("La base della vita");
+        }
+        else if (aiutousato4[3] == 0) {
+          alert("Dal 2006 E122,prima E120");
+        }
+        else if (aiutousato4.reduce((acc, val) => acc && val === 1, true)) {
+          alert("Hai trovato tutte le risposte in questa griglia");
+        }
+      }
+
+    });
+
+
+
+
+
+    const ViteIllimitate = document.getElementById("viteillimitate");
+    ViteIllimitate.addEventListener("click", () => {
+      ViteIllimitate.style.display = "none";
+      Vite1.style.display = "none";
+      Vite2.style.display = "none";
+      Vite3.style.display = "none";
+      Vite4.style.display = "none";
+      Vite5.style.display = "none";
+      ViteLimitate = 0;
+
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </script>
+
+</body>
+</html>
